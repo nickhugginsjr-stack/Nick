@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --background: #05060a;
+  --foreground: #e8eaf0;
+
+  --arena-surface: #0d0f16;
+  --arena-surface-raised: #12141d;
+  --arena-border: #1f2330;
+
+  --accent: #f2b705;
+  --accent-soft: #7a5c04;
+  --state-live: #22c55e;
+  --state-warn: #f2b705;
+  --state-info: #38bdf8;
+  --state-danger: #ef4444;
+  --state-voicemail: #a855f7;
+  --state-idle: #4b5263;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-arena-surface: var(--arena-surface);
+  --color-arena-surface-raised: var(--arena-surface-raised);
+  --color-arena-border: var(--arena-border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-state-live: var(--state-live);
+  --color-state-warn: var(--state-warn);
+  --color-state-info: var(--state-info);
+  --color-state-danger: var(--state-danger);
+  --color-state-voicemail: var(--state-voicemail);
+  --color-state-idle: var(--state-idle);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: radial-gradient(
+      1200px 600px at 50% -10%,
+      rgba(242, 183, 5, 0.06),
+      transparent 60%
+    ),
+    var(--background);
+  color: var(--foreground);
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.4s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise-in {
+  animation: rise-in 0.25s ease-out;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,161 @@
+// Sales Operating System (SOS) — data model
+// Focused on the Power Dialer Arena: prospects, dial sessions, calls,
+// notes, dispositions, and the relationship timeline/activity feed.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RelationshipStatus {
+  COLD
+  WARM
+  FOLLOW_UP
+  CLIENT
+  DO_NOT_CALL
+}
+
+enum Disposition {
+  APPOINTMENT
+  FOLLOW_UP
+  VOICEMAIL
+  NO_ANSWER
+  NOT_INTERESTED
+  WRONG_NUMBER
+  DO_NOT_CALL
+  SAVE_AND_NEXT
+}
+
+// Lifecycle of a single dial, driven by Twilio status callbacks.
+enum CallState {
+  QUEUED
+  DIALING_REP
+  RINGING_REP
+  DIALING_PROSPECT
+  RINGING_PROSPECT
+  CONNECTED
+  BUSY
+  FAILED
+  NO_ANSWER
+  VOICEMAIL
+  SAVING
+  COMPLETED
+}
+
+enum SessionStatus {
+  ACTIVE
+  ENDED
+}
+
+enum TimelineEventType {
+  COLD_CALL
+  FOLLOW_UP_CALL
+  OFFICE_VISIT
+  APPOINTMENT
+  PROPOSAL
+  APPLICATION
+  POLICY_REVIEW
+  QUOTE
+  BECAME_CLIENT
+  NOTE
+}
+
+model Prospect {
+  id                 String             @id @default(cuid())
+  businessName       String
+  ownerName          String
+  phone              String
+  industry           String?
+  addressLine1       String?
+  city               String?
+  state              String?
+  zip                String?
+  relationshipStatus RelationshipStatus @default(COLD)
+  script             String?
+  quickFacts         String?
+  lastContactedAt    DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  calls          Call[]
+  notes          Note[]
+  timelineEvents TimelineEvent[]
+
+  @@index([relationshipStatus])
+}
+
+model DialSession {
+  id        String        @id @default(cuid())
+  repPhone  String
+  goal      Int           @default(100)
+  status    SessionStatus @default(ACTIVE)
+  startedAt DateTime      @default(now())
+  endedAt   DateTime?
+
+  // Twilio call SID for the standing leg to the rep's own phone.
+  repCallSid String?
+
+  calls  Call[]
+  events ActivityEvent[]
+}
+
+model Call {
+  id         String      @id @default(cuid())
+  session    DialSession @relation(fields: [sessionId], references: [id])
+  sessionId  String
+  prospect   Prospect    @relation(fields: [prospectId], references: [id])
+  prospectId String
+
+  twilioCallSid String?
+  state         CallState    @default(QUEUED)
+  disposition   Disposition?
+
+  startedAt       DateTime  @default(now())
+  connectedAt     DateTime?
+  endedAt         DateTime?
+  durationSeconds Int?
+
+  notes Note[]
+
+  @@index([sessionId])
+  @@index([prospectId])
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  prospect   Prospect @relation(fields: [prospectId], references: [id])
+  prospectId String
+  call       Call?    @relation(fields: [callId], references: [id])
+  callId     String?
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@index([prospectId])
+}
+
+model ActivityEvent {
+  id        String      @id @default(cuid())
+  session   DialSession @relation(fields: [sessionId], references: [id])
+  sessionId String
+  message   String
+  type      String
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId])
+}
+
+model TimelineEvent {
+  id         String            @id @default(cuid())
+  prospect   Prospect          @relation(fields: [prospectId], references: [id])
+  prospectId String
+  type       TimelineEventType
+  label      String
+  notes      String?
+  occurredAt DateTime          @default(now())
+
+  @@index([prospectId])
+}
