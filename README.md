@@ -88,6 +88,40 @@ Without Twilio credentials configured, the UI still runs and the API
 returns a clear error rather than crashing — useful for working on the
 interface without a Twilio account connected.
 
+## Deploying to Vercel
+
+Twilio needs a stable public URL, so for real use (rather than local dev
+with a tunnel), deploy this to Vercel:
+
+1. **Import the project.** In the Vercel dashboard: **Add New → Project →
+   Import Git Repository**, select this repo
+   (`nickhugginsjr-stack/nick`), branch `claude/sos-vision-product-4xwmwh`
+   (or after merging, your default branch).
+2. **Add a Postgres database.** In the new project's **Storage** tab:
+   **Create Database → Postgres**. Vercel provisions it and automatically
+   sets `DATABASE_URL` in your project's environment variables — you don't
+   need to create this yourself.
+3. **Add the remaining environment variables** under **Settings →
+   Environment Variables**:
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_PHONE_NUMBER`
+   - `REP_PHONE_NUMBER` (your phone, e.g. `+12094236339`)
+   - `PUBLIC_BASE_URL` — set this to your Vercel deployment URL (e.g.
+     `https://your-project.vercel.app`) once you know it. You may need to
+     deploy once first to get the URL, then add this variable and
+     redeploy.
+4. **Deploy.** The build runs `prisma migrate deploy` automatically
+   (see `package.json`), so the schema is applied to your new database on
+   every deploy — no manual migration step needed. Run
+   `npx prisma db seed` once locally with `DATABASE_URL` pointed at the
+   production database if you want the sample prospects loaded there too.
+5. **Verify Twilio's webhooks can reach you** by visiting
+   `https://your-project.vercel.app` and confirming the Start Screen loads.
+   Trial Twilio accounts can only call **verified** numbers — add your own
+   number under **Phone Numbers → Verified Caller IDs** in the Twilio
+   Console before pressing Start Game.
+
 ## Project structure
 
 - `src/app/page.tsx` — the Dialer Arena (start screen → live session →
