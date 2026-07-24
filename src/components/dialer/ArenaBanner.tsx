@@ -118,13 +118,13 @@ export function ArenaBanner({
 
       {/* White scoreboard band: brand header + headline stats */}
       <div
-        className="absolute inset-x-0 top-0 flex flex-col items-center justify-center"
+        className="absolute inset-x-0 top-0 flex flex-col items-center justify-center gap-2"
         style={{ height: `${WHITE_ZONE_HEIGHT_PCT}%` }}
       >
-        <p className="text-[9px] font-bold italic tracking-tight text-black/70 sm:text-sm md:text-base">
+        <p className="text-center text-[9px] font-bold italic tracking-tight text-black/70 sm:text-sm md:text-base">
           Nu. Money&apos;s Sales Arena
         </p>
-        <div className="mt-1 flex items-center justify-center gap-6 sm:gap-14 md:gap-24">
+        <div className="flex items-center justify-center gap-6 sm:gap-14 md:gap-24">
           <HeadlineStat label="Dials" value={totalDials} />
           <HeadlineStat label="Conversations" value={conversations} />
           <HeadlineStat label="Appointments" value={appointments} accent />
