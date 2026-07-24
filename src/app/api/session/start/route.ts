@@ -81,17 +81,20 @@ export async function POST(request: Request) {
       data: { status: "ENDED", endedAt: new Date() },
     });
     const message = err instanceof Error ? err.message : "Unknown error";
-    const twilioErr = err as { code?: number; moreInfo?: string };
-    console.error("Twilio call to rep failed:", {
-      message,
-      code: twilioErr.code,
-      moreInfo: twilioErr.moreInfo,
-    });
-    const detail = twilioErr.code
-      ? `${message} (Twilio error ${twilioErr.code}${
-          twilioErr.moreInfo ? `, see ${twilioErr.moreInfo}` : ""
-        })`
-      : message;
+    // Dump every enumerable property (code, status, moreInfo, details, ...)
+    // rather than guessing the shape — some Twilio error responses omit
+    // the usual `code`/`more_info` fields entirely.
+    const raw =
+      err && typeof err === "object"
+        ? Object.fromEntries(
+            Object.entries(err).filter(([k]) => k !== "stack")
+          )
+        : {};
+    console.error("Twilio call to rep failed:", message, raw);
+    const detail =
+      Object.keys(raw).length > 0
+        ? `${message} | details: ${JSON.stringify(raw)}`
+        : message;
     return NextResponse.json({ error: detail }, { status: 502 });
   }
 
