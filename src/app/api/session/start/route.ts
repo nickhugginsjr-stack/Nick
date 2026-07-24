@@ -81,7 +81,18 @@ export async function POST(request: Request) {
       data: { status: "ENDED", endedAt: new Date() },
     });
     const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 502 });
+    const twilioErr = err as { code?: number; moreInfo?: string };
+    console.error("Twilio call to rep failed:", {
+      message,
+      code: twilioErr.code,
+      moreInfo: twilioErr.moreInfo,
+    });
+    const detail = twilioErr.code
+      ? `${message} (Twilio error ${twilioErr.code}${
+          twilioErr.moreInfo ? `, see ${twilioErr.moreInfo}` : ""
+        })`
+      : message;
+    return NextResponse.json({ error: detail }, { status: 502 });
   }
 
   return NextResponse.json({ sessionId: session.id });
