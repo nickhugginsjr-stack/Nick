@@ -88,6 +88,13 @@ export async function POST(request: Request) {
     method: "POST",
   });
 
+  // Answering Machine Detection is a premium feature Twilio blocks on
+  // trial accounts ("Invalid or disallowed parameters provided"). Only
+  // send these params once TWILIO_MACHINE_DETECTION=true is set, which
+  // you can do after upgrading out of trial.
+  const machineDetectionEnabled =
+    process.env.TWILIO_MACHINE_DETECTION === "true";
+
   dial.number(
     {
       statusCallback: twimlUrl("/api/twilio/status/prospect", {
@@ -96,11 +103,15 @@ export async function POST(request: Request) {
       }),
       statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
       statusCallbackMethod: "POST",
-      machineDetection: "Enable",
-      amdStatusCallback: twimlUrl("/api/twilio/voice/amd", {
-        callId: call.id,
-      }),
-      amdStatusCallbackMethod: "POST",
+      ...(machineDetectionEnabled
+        ? {
+            machineDetection: "Enable" as const,
+            amdStatusCallback: twimlUrl("/api/twilio/voice/amd", {
+              callId: call.id,
+            }),
+            amdStatusCallbackMethod: "POST" as const,
+          }
+        : {}),
     },
     prospect.phone
   );

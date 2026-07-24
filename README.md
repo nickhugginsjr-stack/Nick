@@ -121,6 +121,12 @@ with a tunnel), deploy this to Vercel:
    Trial Twilio accounts can only call **verified** numbers — add your own
    number under **Phone Numbers → Verified Caller IDs** in the Twilio
    Console before pressing Start Game.
+6. **Trial accounts and Answering Machine Detection.** Twilio trial
+   accounts reject calls that request Answering Machine Detection
+   (`"Invalid or disallowed parameters provided"`), so it's off by
+   default. Once you've upgraded out of trial, set
+   `TWILIO_MACHINE_DETECTION=true` to enable the voicemail-detected
+   activity note.
 
 ## Project structure
 
