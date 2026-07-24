@@ -38,8 +38,10 @@ function HeadlineStat({
 
 function Kpi({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex flex-col items-center px-1.5 sm:px-2.5">
-      <span className={`${arcade.className} text-[10px] leading-none text-accent sm:text-sm md:text-base`}>
+    <div className="flex flex-col items-center rounded-md border border-white/15 bg-white/5 px-2 py-1 sm:px-3 sm:py-1.5">
+      <span
+        className={`${arcade.className} text-xs leading-none text-accent sm:text-base md:text-lg`}
+      >
         {value}
       </span>
       <span className="mt-1 text-[6px] uppercase tracking-widest text-white/50 sm:text-[8px]">
@@ -114,14 +116,19 @@ export function ArenaBanner({
         className="absolute inset-0 h-full w-full object-cover"
       />
 
-      {/* White scoreboard band: headline stats */}
+      {/* White scoreboard band: brand header + headline stats */}
       <div
-        className="absolute inset-x-0 top-0 flex items-center justify-center gap-6 sm:gap-14 md:gap-24"
+        className="absolute inset-x-0 top-0 flex flex-col items-center justify-center"
         style={{ height: `${WHITE_ZONE_HEIGHT_PCT}%` }}
       >
-        <HeadlineStat label="Dials" value={totalDials} />
-        <HeadlineStat label="Conversations" value={conversations} />
-        <HeadlineStat label="Appointments" value={appointments} accent />
+        <p className="absolute right-3 top-1.5 text-[9px] font-bold italic tracking-tight text-black/70 sm:right-5 sm:top-2.5 sm:text-sm md:text-base">
+          Nu. Money&apos;s Sales Arena
+        </p>
+        <div className="flex items-center justify-center gap-6 sm:gap-14 md:gap-24">
+          <HeadlineStat label="Dials" value={totalDials} />
+          <HeadlineStat label="Conversations" value={conversations} />
+          <HeadlineStat label="Appointments" value={appointments} accent />
+        </div>
       </div>
 
       {/* Black scoreboard band: remaining KPIs + live play-by-play */}
@@ -132,7 +139,7 @@ export function ArenaBanner({
           height: `${BLACK_ZONE_HEIGHT_PCT}%`,
         }}
       >
-        <div className="flex flex-1 items-center justify-center gap-0.5 overflow-x-auto px-1 sm:gap-1">
+        <div className="flex flex-1 items-center justify-center gap-1 overflow-x-auto px-1 sm:gap-2">
           <Kpi label="Quarter" value={`Q${quarter}`} />
           <Kpi label="Follow-ups" value={followUps} />
           <Kpi label="Voicemails" value={voicemails} />
