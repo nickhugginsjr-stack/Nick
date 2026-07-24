@@ -23,6 +23,27 @@ export function requireTwilioNumber() {
   return number;
 }
 
+const E164_PATTERN = /^\+[1-9]\d{1,14}$/;
+
+/**
+ * Twilio's REST API rejects malformed phone numbers with a vague
+ * "Invalid or disallowed parameters" error that doesn't say which field
+ * is wrong. Validate E.164 format ourselves first so the error names the
+ * exact value and what's wrong with it (missing "+", stray quotes/spaces
+ * from pasting into an env var, etc).
+ */
+export function assertE164(value: string, label: string) {
+  const trimmed = value.trim();
+  if (trimmed !== value || !E164_PATTERN.test(trimmed)) {
+    throw new Error(
+      `${label} must be in E.164 format like +12095551234 (got: ${JSON.stringify(
+        value
+      )}). Check for stray quotes, spaces, or a missing "+" in the Vercel env var.`
+    );
+  }
+  return trimmed;
+}
+
 export function publicBaseUrl() {
   const url = process.env.PUBLIC_BASE_URL;
   if (!url) {

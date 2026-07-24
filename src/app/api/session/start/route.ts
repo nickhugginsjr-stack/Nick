@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
+  assertE164,
   requireTwilioClient,
   requireTwilioNumber,
 } from "@/lib/twilio";
@@ -32,8 +33,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const repPhone = parsed.data.repPhone ?? process.env.REP_PHONE_NUMBER;
-  if (!repPhone) {
+  const repPhoneRaw = parsed.data.repPhone ?? process.env.REP_PHONE_NUMBER;
+  if (!repPhoneRaw) {
     return NextResponse.json(
       {
         error:
@@ -41,6 +42,16 @@ export async function POST(request: Request) {
       },
       { status: 400 }
     );
+  }
+
+  let repPhone: string;
+  let twilioNumber: string;
+  try {
+    repPhone = assertE164(repPhoneRaw, "Rep phone number");
+    twilioNumber = assertE164(requireTwilioNumber(), "TWILIO_PHONE_NUMBER");
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Invalid phone number";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const session = await prisma.dialSession.create({
@@ -54,7 +65,7 @@ export async function POST(request: Request) {
     const client = requireTwilioClient();
     const call = await client.calls.create({
       to: repPhone,
-      from: requireTwilioNumber(),
+      from: twilioNumber,
       url: twimlUrl("/api/twilio/voice/rep-answered", {
         sessionId: session.id,
       }),
