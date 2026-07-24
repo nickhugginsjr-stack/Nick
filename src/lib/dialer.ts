@@ -100,7 +100,9 @@ export async function getSessionSnapshot(sessionId: string) {
     }),
     prisma.activityEvent.findMany({
       where: { sessionId },
-      orderBy: { createdAt: "desc" },
+      // id as a tiebreaker: cuids are monotonically increasing, so this
+      // keeps insertion order stable when events share a createdAt tick.
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: 30,
     }),
     prisma.call.findMany({

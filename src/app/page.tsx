@@ -3,9 +3,8 @@
 import { useCallback } from "react";
 import { useSessionPolling } from "@/hooks/useSessionPolling";
 import { useSessionIdStorage } from "@/hooks/useSessionIdStorage";
-import { Scoreboard } from "@/components/dialer/Scoreboard";
+import { ArenaBanner } from "@/components/dialer/ArenaBanner";
 import { ArenaStage } from "@/components/dialer/ArenaStage";
-import { ActivityFeed } from "@/components/dialer/ActivityFeed";
 import { StartScreen } from "@/components/dialer/StartScreen";
 import { GameOverScreen } from "@/components/dialer/GameOverScreen";
 import type { Disposition } from "@/lib/types";
@@ -62,6 +61,7 @@ export default function DialerArenaPage() {
   if (!sessionId || !snapshot) {
     return (
       <div className="flex flex-1 flex-col">
+        <ArenaBanner snapshot={null} />
         <StartScreen onStart={handleStart} />
       </div>
     );
@@ -70,6 +70,7 @@ export default function DialerArenaPage() {
   if (snapshot.session.status === "ENDED") {
     return (
       <div className="flex flex-1 flex-col">
+        <ArenaBanner snapshot={snapshot} />
         <GameOverScreen snapshot={snapshot} onNewSession={handleNewSession} />
       </div>
     );
@@ -77,9 +78,7 @@ export default function DialerArenaPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between">
-        <Scoreboard snapshot={snapshot} />
-      </div>
+      <ArenaBanner snapshot={snapshot} />
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-4">
         <div className="flex items-center justify-end">
           <button
@@ -89,15 +88,10 @@ export default function DialerArenaPage() {
             End Session
           </button>
         </div>
-        <div className="grid flex-1 grid-cols-1 gap-4 xl:grid-cols-[1fr_320px]">
-          <ArenaStage
-            currentCall={snapshot.currentCall}
-            onDisposition={handleDisposition}
-          />
-          <div className="min-h-[240px] xl:h-full">
-            <ActivityFeed events={snapshot.activity} />
-          </div>
-        </div>
+        <ArenaStage
+          currentCall={snapshot.currentCall}
+          onDisposition={handleDisposition}
+        />
       </div>
     </div>
   );
