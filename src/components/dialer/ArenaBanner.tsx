@@ -116,9 +116,11 @@ export function ArenaBanner({
         className="absolute inset-0 h-full w-full object-cover"
       />
 
-      {/* White scoreboard band: brand header + headline stats */}
+      {/* White scoreboard band: brand header + headline stats, evenly
+          spaced so the gap above the header, between header and stats,
+          and below the stats are all equal. */}
       <div
-        className="absolute inset-x-0 top-0 flex flex-col items-center justify-center gap-2"
+        className="absolute inset-x-0 top-0 flex flex-col items-center justify-evenly"
         style={{ height: `${WHITE_ZONE_HEIGHT_PCT}%` }}
       >
         <p className="text-center text-[9px] font-bold italic tracking-tight text-black/70 sm:text-sm md:text-base">
