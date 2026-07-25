@@ -5,6 +5,7 @@ export const CALL_STATE_DISPLAY: Record<
   { label: string; color: string; pulse: boolean }
 > = {
   QUEUED: { label: "READY", color: "text-state-idle", pulse: false },
+  PREVIEW: { label: "PRESS SPACE TO DIAL", color: "text-accent", pulse: true },
   DIALING_REP: { label: "CALLING YOU", color: "text-state-warn", pulse: true },
   RINGING_REP: { label: "CALLING YOU", color: "text-state-warn", pulse: true },
   DIALING_PROSPECT: { label: "DIALING...", color: "text-state-warn", pulse: true },

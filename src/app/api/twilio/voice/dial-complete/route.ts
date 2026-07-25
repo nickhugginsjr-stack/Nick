@@ -54,7 +54,7 @@ export async function POST(request: Request) {
   if (!call) {
     twiml.redirect(
       { method: "POST" },
-      twimlUrl("/api/twilio/voice/next", { sessionId })
+      twimlUrl("/api/twilio/voice/preview-next", { sessionId })
     );
     return new NextResponse(twiml.toString(), {
       headers: { "Content-Type": "text/xml" },
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
   if (isAutoAdvanceOutcome(dialCallStatus)) {
     twiml.redirect(
       { method: "POST" },
-      twimlUrl("/api/twilio/voice/next", { sessionId })
+      twimlUrl("/api/twilio/voice/preview-next", { sessionId })
     );
   } else {
     // A human (or voicemail) answered and the call has now ended.

@@ -1,5 +1,6 @@
 export type CallState =
   | "QUEUED"
+  | "PREVIEW"
   | "DIALING_REP"
   | "RINGING_REP"
   | "DIALING_PROSPECT"

@@ -1,20 +1,17 @@
 import twilio from "twilio";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import {
-  parseTwilioForm,
-  requireTwilioNumber,
-  verifyTwilioRequest,
-} from "@/lib/twilio";
-import {
-  DIAL_TIMEOUT_SECONDS,
-  getNextProspect,
-  logActivity,
-  twimlUrl,
-} from "@/lib/dialer";
+import { parseTwilioForm, verifyTwilioRequest } from "@/lib/twilio";
+import { getNextProspect, logActivity } from "@/lib/dialer";
 
 const { VoiceResponse } = twilio.twiml;
 
+/**
+ * Picks the next prospect and holds the rep's line open while their info
+ * is shown in the UI — it does NOT dial yet. The rep presses spacebar in
+ * the app (POST /api/calls/[id]/confirm-dial), which redirects this same
+ * live call to /api/twilio/voice/dial-prospect to actually place the call.
+ */
 export async function POST(request: Request) {
   const params = await parseTwilioForm(request);
   const url = new URL(request.url);
@@ -64,57 +61,23 @@ export async function POST(request: Request) {
     });
   }
 
-  const call = await prisma.call.create({
+  await prisma.call.create({
     data: {
       sessionId,
       prospectId: prospect.id,
-      state: "DIALING_PROSPECT",
+      state: "PREVIEW",
     },
   });
 
   await logActivity(
     sessionId,
-    "DIALING",
-    `Dialing ${prospect.businessName} (${prospect.ownerName})...`
+    "PREVIEW",
+    `Next up: ${prospect.businessName} (${prospect.ownerName}) — press space to dial.`
   );
 
-  const dial = twiml.dial({
-    callerId: requireTwilioNumber(),
-    timeout: DIAL_TIMEOUT_SECONDS,
-    action: twimlUrl("/api/twilio/voice/dial-complete", {
-      sessionId,
-      callId: call.id,
-    }),
-    method: "POST",
-  });
-
-  // Answering Machine Detection is a premium feature Twilio blocks on
-  // trial accounts ("Invalid or disallowed parameters provided"). Only
-  // send these params once TWILIO_MACHINE_DETECTION=true is set, which
-  // you can do after upgrading out of trial.
-  const machineDetectionEnabled =
-    process.env.TWILIO_MACHINE_DETECTION === "true";
-
-  dial.number(
-    {
-      statusCallback: twimlUrl("/api/twilio/status/prospect", {
-        sessionId,
-        callId: call.id,
-      }),
-      statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
-      statusCallbackMethod: "POST",
-      ...(machineDetectionEnabled
-        ? {
-            machineDetection: "Enable" as const,
-            amdStatusCallback: twimlUrl("/api/twilio/voice/amd", {
-              callId: call.id,
-            }),
-            amdStatusCallbackMethod: "POST" as const,
-          }
-        : {}),
-    },
-    prospect.phone
-  );
+  // Hold the line silently until the rep confirms via spacebar, which
+  // interrupts this call with a REST API update.
+  twiml.pause({ length: 1800 });
 
   return new NextResponse(twiml.toString(), {
     headers: { "Content-Type": "text/xml" },

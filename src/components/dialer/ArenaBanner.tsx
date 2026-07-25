@@ -6,6 +6,22 @@ import type { SessionSnapshot } from "@/lib/types";
 
 const arcade = Press_Start_2P({ weight: "400", subsets: ["latin"] });
 
+// Play-by-play color coding: white for routine progress, orange for
+// negative/attention outcomes, money green for a good outcome (a
+// disposition logged after an actual conversation).
+const PBP_COLOR: Record<string, string> = {
+  DIALING: "text-white/90",
+  CALL_STATE: "text-white/90",
+  SESSION_STARTED: "text-white/90",
+  REP_ANSWERED: "text-white/90",
+  DIAL_RESULT: "text-orange-400",
+  SESSION_ENDED: "text-orange-400",
+  VOICEMAIL_DETECTED: "text-orange-400",
+  ERROR: "text-orange-400",
+  DISPOSITION: "text-state-live",
+};
+const DEFAULT_PBP_COLOR = "text-white/70";
+
 // Measured proportions of the tip-off image: white scoreboard band, then
 // the black scoreboard band, then the court/crowd art (decorative only).
 const WHITE_ZONE_HEIGHT_PCT = 21.42;
@@ -223,7 +239,9 @@ export function ArenaBanner({
             {activity.slice(0, 8).map((e) => (
               <p
                 key={e.id}
-                className="truncate leading-tight text-white/70"
+                className={`truncate leading-tight ${
+                  PBP_COLOR[e.type] ?? DEFAULT_PBP_COLOR
+                }`}
                 style={{ fontSize: FLUID.pbpItem }}
               >
                 {e.message}

@@ -48,6 +48,20 @@ export default function DialerArenaPage() {
     [refresh]
   );
 
+  const handleConfirmDial = useCallback(
+    async (callId: string) => {
+      const res = await fetch(`/api/calls/${callId}/confirm-dial`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.toString() ?? "Failed to dial.");
+      }
+      await refresh();
+    },
+    [refresh]
+  );
+
   const handleEndSession = useCallback(async () => {
     if (!sessionId) return;
     await fetch(`/api/session/${sessionId}/end`, { method: "POST" });
@@ -91,6 +105,7 @@ export default function DialerArenaPage() {
         <ArenaStage
           currentCall={snapshot.currentCall}
           onDisposition={handleDisposition}
+          onConfirmDial={handleConfirmDial}
         />
       </div>
     </div>

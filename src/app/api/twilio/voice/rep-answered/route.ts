@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   const twiml = new VoiceResponse();
   twiml.redirect(
     { method: "POST" },
-    twimlUrl("/api/twilio/voice/next", { sessionId })
+    twimlUrl("/api/twilio/voice/preview-next", { sessionId })
   );
 
   return new NextResponse(twiml.toString(), {

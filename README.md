@@ -15,18 +15,24 @@ described in the full product vision are not built yet.
 ## How the dialer works
 
 1. Click **START GAME** — the server calls *your* phone via Twilio.
-2. When you answer, the system immediately starts dialing the first
-   prospect in the queue and bridges the call live to your phone.
-3. **Busy / failed / no answer** → the system automatically advances to
-   the next prospect. You never touch anything.
-4. **A human (or voicemail) answers** → you're connected live. Type notes
-   as you talk (autosaved), then pick a disposition — the system
-   immediately dials the next prospect on your existing phone line.
+2. When you answer, the system picks the next prospect and shows a brief
+   overview of them — it does **not** dial yet.
+3. Press **spacebar** to actually place the call, bridging it live to
+   your phone. The full working screen (prospect card, notes, niche
+   script) appears once the call is placed.
+4. **Busy / failed / no answer** → the system automatically previews the
+   next prospect (still waiting on your spacebar — it never dials without
+   confirmation).
+5. **A human (or voicemail) answers** → you're connected live. Type notes
+   as you talk (autosaved), then pick a disposition — the system previews
+   the next prospect on your existing phone line, again waiting for you
+   to press space.
 
-This is implemented with a single standing call to your phone: each
-"next dial" is a live Twilio `<Dial>` from that call, and disposition
-submission uses the Twilio REST API to redirect your live call to the
-next prospect — no re-dialing your phone between prospects.
+This is implemented with a single standing call to your phone: picking
+the next prospect holds that live call on a silent pause while you
+review their info, and pressing space uses the Twilio REST API to
+redirect the live call into an actual `<Dial>` — no re-dialing your
+phone between prospects.
 
 ## Prerequisites
 

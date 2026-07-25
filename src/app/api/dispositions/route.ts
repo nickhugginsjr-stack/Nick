@@ -119,14 +119,14 @@ export async function POST(request: Request) {
   await logActivity(
     call.sessionId,
     "DISPOSITION",
-    `${call.prospect.businessName}: ${TIMELINE_LABEL[disposition]}. Dialing next...`
+    `${call.prospect.businessName}: ${TIMELINE_LABEL[disposition]}.`
   );
 
   if (call.session.repCallSid && twilioClient) {
     try {
       await twilioClient.calls(call.session.repCallSid).update({
         method: "POST",
-        url: twimlUrl("/api/twilio/voice/next", {
+        url: twimlUrl("/api/twilio/voice/preview-next", {
           sessionId: call.sessionId,
         }),
       });
