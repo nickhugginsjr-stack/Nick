@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export function StartScreen({
   onStart,
@@ -66,6 +67,13 @@ export function StartScreen({
       </button>
 
       {error && <p className="mt-4 text-sm text-state-danger">{error}</p>}
+
+      <Link
+        href="/import"
+        className="mt-6 text-sm text-foreground/40 underline-offset-4 hover:text-accent hover:underline"
+      >
+        Import prospects from a CSV
+      </Link>
     </div>
   );
 }

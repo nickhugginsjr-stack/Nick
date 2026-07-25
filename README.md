@@ -88,6 +88,17 @@ Without Twilio credentials configured, the UI still runs and the API
 returns a clear error rather than crashing — useful for working on the
 interface without a Twilio account connected.
 
+## Importing prospects from a CSV
+
+From the Start Screen, click **Import prospects from a CSV** (or go to
+`/import`). Upload a `.csv` export from Excel/Sheets — columns can be in
+any order; headers are matched case-insensitively (e.g. "Business Name",
+"Company", "Owner", "Contact Name", "Phone", "Notes", "Quick Facts" are
+all recognized). A downloadable template is linked on that page. Phone
+numbers are normalized to E.164 automatically (a bare 10-digit US number
+gets `+1` added); duplicate phone numbers are skipped rather than
+creating a second record.
+
 ## Deploying to Vercel
 
 Twilio needs a stable public URL, so for real use (rather than local dev

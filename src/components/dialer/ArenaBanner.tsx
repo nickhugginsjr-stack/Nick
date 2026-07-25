@@ -75,7 +75,6 @@ export function ArenaBanner({
   const appointments = dispositionCounts.APPOINTMENT ?? 0;
   const followUps = dispositionCounts.FOLLOW_UP ?? 0;
   const voicemails = dispositionCounts.VOICEMAIL ?? 0;
-  const busy = stateCounts.BUSY ?? 0;
   const noAnswer = stateCounts.NO_ANSWER ?? 0;
   const failed = stateCounts.FAILED ?? 0;
   const goalPct = Math.min(
@@ -96,10 +95,15 @@ export function ArenaBanner({
   const quarter = snapshot
     ? Math.min(4, Math.floor(totalDials / Math.max(1, goal / 4)) + 1)
     : 1;
-  const mm = Math.floor(elapsedSeconds / 60)
+  const SESSION_CLOCK_SECONDS = 60 * 60;
+  const remainingSeconds = Math.max(
+    0,
+    SESSION_CLOCK_SECONDS - elapsedSeconds
+  );
+  const mm = Math.floor(remainingSeconds / 60)
     .toString()
     .padStart(2, "0");
-  const ss = (elapsedSeconds % 60).toString().padStart(2, "0");
+  const ss = (remainingSeconds % 60).toString().padStart(2, "0");
 
   const activity = snapshot?.activity ?? [];
 
@@ -143,7 +147,6 @@ export function ArenaBanner({
           <Kpi label="Quarter" value={`Q${quarter}`} />
           <Kpi label="Follow-ups" value={followUps} />
           <Kpi label="Voicemails" value={voicemails} />
-          <Kpi label="Busy" value={busy} />
           <Kpi label="No Answer" value={noAnswer} />
           <Kpi label="Failed" value={failed} />
           <Kpi label="Pace/hr" value={pace} />
