@@ -31,7 +31,7 @@ export function ProspectCard({
     .join(", ");
 
   return (
-    <div className="animate-rise-in rounded-2xl border border-arena-border bg-arena-surface-raised p-5">
+    <div className="@container animate-rise-in rounded-2xl border border-arena-border bg-arena-surface-raised p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
@@ -45,7 +45,7 @@ export function ProspectCard({
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 text-sm @sm:grid-cols-4">
         <Field label="Phone" value={prospect.phone} />
         <Field label="Industry" value={prospect.industry ?? "—"} />
         <Field label="Address" value={address || "—"} />

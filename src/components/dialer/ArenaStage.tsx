@@ -5,6 +5,7 @@ import type { CallSnapshot, Disposition } from "@/lib/types";
 import { CALL_STATE_DISPLAY } from "@/lib/callStateDisplay";
 import { ProspectCard } from "@/components/dialer/ProspectCard";
 import { NotesPanel } from "@/components/dialer/NotesPanel";
+import { ScriptPanel } from "@/components/dialer/ScriptPanel";
 import { DispositionButtons } from "@/components/dialer/DispositionButtons";
 
 const ANSWERED_STATES = new Set(["CONNECTED", "COMPLETED", "VOICEMAIL"]);
@@ -74,7 +75,7 @@ export function ArenaStage({
         </p>
       </div>
 
-      <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[1.3fr_1fr]">
+      <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_0.85fr] xl:grid-cols-[1fr_0.85fr_1fr]">
         <ProspectCard
           prospect={currentCall.prospect}
           previousNote={currentCall.previousNotes[0]?.content}
@@ -85,6 +86,7 @@ export function ArenaStage({
           initialContent={existingNote?.content ?? ""}
           onContentChange={setNotesDraft}
         />
+        <ScriptPanel industry={currentCall.prospect.industry} />
       </div>
 
       <div className="rounded-2xl border border-arena-border bg-arena-surface-raised p-4">

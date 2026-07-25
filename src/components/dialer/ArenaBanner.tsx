@@ -11,6 +11,28 @@ const arcade = Press_Start_2P({ weight: "400", subsets: ["latin"] });
 const WHITE_ZONE_HEIGHT_PCT = 21.42;
 const BLACK_ZONE_HEIGHT_PCT = 35.25;
 
+// Every size below scales continuously with viewport width (clamp(min,
+// preferred-vw, max)) instead of jumping between fixed breakpoints, so
+// the banner holds together at any window width — half-screen,
+// full-screen, or in between — and responds naturally to browser zoom
+// (which is itself a viewport-width change from the CSS engine's
+// perspective).
+const FLUID = {
+  headlineValue: "clamp(1.1rem, 3.4vw, 2.5rem)",
+  headlineLabel: "clamp(0.45rem, 0.85vw, 0.75rem)",
+  headlineGap: "clamp(1rem, 5vw, 6rem)",
+  brandHeader: "clamp(0.5rem, 1vw, 1rem)",
+  kpiValue: "clamp(0.6rem, 1.5vw, 1.5rem)",
+  kpiLabel: "clamp(0.4rem, 0.62vw, 0.65rem)",
+  kpiPaddingX: "clamp(4px, 1vw, 16px)",
+  kpiPaddingY: "clamp(3px, 0.8vw, 12px)",
+  kpiGap: "clamp(2px, 0.6vw, 12px)",
+  pbpHeader: "clamp(0.4rem, 0.75vw, 0.6rem)",
+  pbpItem: "clamp(0.42rem, 0.72vw, 0.65rem)",
+  pbpWidth: "clamp(80px, 22vw, 280px)",
+  pbpPadding: "clamp(4px, 0.8vw, 12px)",
+};
+
 function HeadlineStat({
   label,
   value,
@@ -23,13 +45,17 @@ function HeadlineStat({
   return (
     <div className="flex flex-col items-center">
       <span
-        className={`${arcade.className} text-lg tabular-nums leading-none sm:text-3xl md:text-4xl ${
+        className={`${arcade.className} tabular-nums leading-none ${
           accent ? "text-red-600" : "text-[#0a0a0a]"
         }`}
+        style={{ fontSize: FLUID.headlineValue }}
       >
         {value}
       </span>
-      <span className="mt-1 text-[7px] uppercase tracking-widest text-black/60 sm:text-[10px] md:text-xs">
+      <span
+        className="mt-1 uppercase tracking-widest text-black/60"
+        style={{ fontSize: FLUID.headlineLabel }}
+      >
         {label}
       </span>
     </div>
@@ -38,13 +64,23 @@ function HeadlineStat({
 
 function Kpi({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex h-[80%] flex-col items-center justify-center rounded-lg border border-white/15 bg-white/5 px-3 py-2 sm:px-4 sm:py-3">
+    <div
+      className="flex h-[80%] flex-col items-center justify-center rounded-lg border border-white/15 bg-white/5"
+      style={{
+        paddingInline: FLUID.kpiPaddingX,
+        paddingBlock: FLUID.kpiPaddingY,
+      }}
+    >
       <span
-        className={`${arcade.className} text-base leading-none text-accent sm:text-xl md:text-2xl`}
+        className={`${arcade.className} leading-none text-accent`}
+        style={{ fontSize: FLUID.kpiValue }}
       >
         {value}
       </span>
-      <span className="mt-1.5 text-[7px] uppercase tracking-widest text-white/50 sm:text-[9px] md:text-[10px]">
+      <span
+        className="mt-1.5 uppercase tracking-widest text-white/50"
+        style={{ fontSize: FLUID.kpiLabel }}
+      >
         {label}
       </span>
     </div>
@@ -85,7 +121,9 @@ export function ArenaBanner({
   const elapsedSeconds = snapshot
     ? Math.max(
         0,
-        Math.floor((now - new Date(snapshot.session.startedAt).getTime()) / 1000)
+        Math.floor(
+          (now - new Date(snapshot.session.startedAt).getTime()) / 1000
+        )
       )
     : 0;
   const pace =
@@ -96,10 +134,7 @@ export function ArenaBanner({
     ? Math.min(4, Math.floor(totalDials / Math.max(1, goal / 4)) + 1)
     : 1;
   const SESSION_CLOCK_SECONDS = 60 * 60;
-  const remainingSeconds = Math.max(
-    0,
-    SESSION_CLOCK_SECONDS - elapsedSeconds
-  );
+  const remainingSeconds = Math.max(0, SESSION_CLOCK_SECONDS - elapsedSeconds);
   const mm = Math.floor(remainingSeconds / 60)
     .toString()
     .padStart(2, "0");
@@ -125,10 +160,16 @@ export function ArenaBanner({
         className="absolute inset-x-0 top-0 flex items-center justify-center"
         style={{ height: `${WHITE_ZONE_HEIGHT_PCT}%` }}
       >
-        <p className="absolute left-3 top-1.5 text-[9px] font-bold italic tracking-tight text-black/70 sm:left-5 sm:top-2.5 sm:text-sm md:text-base">
+        <p
+          className="absolute left-[1.2%] top-[8%] font-bold italic tracking-tight text-black/70"
+          style={{ fontSize: FLUID.brandHeader }}
+        >
           Nu. Money&apos;s Sales Arena
         </p>
-        <div className="flex items-center justify-center gap-6 sm:gap-14 md:gap-24">
+        <div
+          className="flex items-center justify-center"
+          style={{ gap: FLUID.headlineGap }}
+        >
           <HeadlineStat label="Dials" value={totalDials} />
           <HeadlineStat label="Conversations" value={conversations} />
           <HeadlineStat label="Appointments" value={appointments} accent />
@@ -143,7 +184,10 @@ export function ArenaBanner({
           height: `${BLACK_ZONE_HEIGHT_PCT}%`,
         }}
       >
-        <div className="flex flex-1 items-center justify-center gap-2 overflow-x-auto px-2 sm:gap-3">
+        <div
+          className="flex flex-1 items-center justify-center overflow-x-auto px-2"
+          style={{ gap: FLUID.kpiGap }}
+        >
           <Kpi label="Quarter" value={`Q${quarter}`} />
           <Kpi label="Follow-ups" value={followUps} />
           <Kpi label="Voicemails" value={voicemails} />
@@ -154,20 +198,33 @@ export function ArenaBanner({
           <Kpi label="Time" value={`${mm}:${ss}`} />
         </div>
 
-        <div className="hidden w-[34%] max-w-[280px] flex-col border-l border-white/10 bg-black/50 px-2 py-1.5 sm:flex md:px-3 md:py-2">
-          <p className={`${arcade.className} text-[7px] text-accent md:text-[9px]`}>
+        <div
+          className="flex flex-col border-l border-white/10 bg-black/50"
+          style={{ width: FLUID.pbpWidth, padding: FLUID.pbpPadding }}
+        >
+          <p
+            className={`${arcade.className} text-accent`}
+            style={{ fontSize: FLUID.pbpHeader }}
+          >
             LIVE PLAY-BY-PLAY
           </p>
-          <div className="mt-1 flex-1 space-y-0.5 overflow-y-auto md:mt-1.5 md:space-y-1">
+          <div
+            className="mt-1 flex-1 overflow-y-auto"
+            style={{ rowGap: "0.2em" }}
+          >
             {activity.length === 0 && (
-              <p className="text-[8px] text-white/30 md:text-[10px]">
+              <p
+                className="text-white/30"
+                style={{ fontSize: FLUID.pbpItem }}
+              >
                 Waiting for activity...
               </p>
             )}
             {activity.slice(0, 8).map((e) => (
               <p
                 key={e.id}
-                className="truncate text-[8px] leading-tight text-white/70 md:text-[10px]"
+                className="truncate leading-tight text-white/70"
+                style={{ fontSize: FLUID.pbpItem }}
               >
                 {e.message}
               </p>
