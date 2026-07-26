@@ -34,6 +34,18 @@ review their info, and pressing space uses the Twilio REST API to
 redirect the live call into an actual `<Dial>` — no re-dialing your
 phone between prospects.
 
+Once every not-yet-tried prospect has been dialed, the queue automatically
+retries prospects that came back Busy or No Answer (up to twice total) —
+those are timing problems, not dead leads, so the session doesn't quietly
+drop them.
+
+## Daily goal
+
+A **Daily Goal** bar (100 dials/day by default — set `DAILY_DIAL_GOAL` to
+change it) tracks dials across every session today, not just the current
+one, and is visible on the start screen, during a session, and on the
+game-over screen.
+
 ## Prerequisites
 
 - Node.js 20+

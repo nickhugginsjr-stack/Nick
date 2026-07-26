@@ -56,7 +56,7 @@ export function GameOverScreen({
         {elapsedMin} minutes · {goalPct}% of goal
       </p>
 
-      <div className="mt-8 grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="@container mt-8 grid w-full max-w-2xl grid-cols-2 gap-3 @sm:grid-cols-4">
         <Stat label="Calls" value={totalDials} />
         <Stat label="Conversations" value={conversations} />
         <Stat label="Appointments" value={dispositionCounts.APPOINTMENT ?? 0} />

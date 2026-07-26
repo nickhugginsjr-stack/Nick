@@ -106,10 +106,10 @@ export function ArenaStage({
     : display.label;
 
   return (
-    <div className="flex flex-1 flex-col gap-4 py-4">
+    <div className="@container flex flex-1 flex-col gap-4 py-4">
       <div className="flex flex-col items-center justify-center py-6">
         <p
-          className={`text-4xl font-bold tracking-widest sm:text-5xl ${
+          className={`text-4xl font-bold tracking-widest @xl:text-5xl ${
             display.color
           } ${display.pulse && !confirmingDial ? "animate-pulse-glow" : ""}`}
         >
@@ -133,7 +133,7 @@ export function ArenaStage({
         </div>
       ) : (
         <>
-          <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_0.85fr] xl:grid-cols-[1fr_0.85fr_1fr]">
+          <div className="grid flex-1 grid-cols-1 gap-4 @3xl:grid-cols-[1fr_0.85fr] @5xl:grid-cols-[1fr_0.85fr_1fr]">
             <ProspectCard
               prospect={currentCall.prospect}
               previousNote={currentCall.previousNotes[0]?.content}

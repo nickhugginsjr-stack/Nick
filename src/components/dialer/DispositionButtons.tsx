@@ -13,6 +13,15 @@ export function DispositionButtons({
   useEffect(() => {
     if (disabled) return;
     function handleKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
       const match = DISPOSITIONS.find((d) => d.shortcut === e.key);
       if (match) {
         e.preventDefault();
@@ -24,7 +33,7 @@ export function DispositionButtons({
   }, [disabled, onSelect]);
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 @sm:grid-cols-4">
       {DISPOSITIONS.map((d) => (
         <button
           key={d.key}

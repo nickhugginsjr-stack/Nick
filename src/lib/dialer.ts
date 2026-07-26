@@ -5,6 +5,27 @@ import { CallState } from "@/generated/prisma/client";
 /** Ring time (seconds) before a dial is treated as "no answer". */
 export const DIAL_TIMEOUT_SECONDS = 20;
 
+/** Minimum dials/day goal, tracked across every session in the day. */
+export const DAILY_DIAL_GOAL = parseInt(
+  process.env.DAILY_DIAL_GOAL ?? "100",
+  10
+);
+
+export async function getDailyProgress() {
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const dials = await prisma.call.count({
+    where: { startedAt: { gte: startOfDay } },
+  });
+
+  return {
+    dials,
+    goal: DAILY_DIAL_GOAL,
+    pct: Math.min(100, Math.round((dials / DAILY_DIAL_GOAL) * 100)),
+  };
+}
+
 export async function logActivity(
   sessionId: string,
   type: string,
@@ -15,23 +36,50 @@ export async function logActivity(
   });
 }
 
+// Busy/no-answer are timing problems, not dead leads — retry each one
+// once more (per session) before the queue is considered exhausted.
+const RETRYABLE_STATES = new Set(["BUSY", "NO_ANSWER"]);
+const MAX_ATTEMPTS_PER_PROSPECT = 2;
+
 /**
  * Picks the next prospect to dial in a session: not on the do-not-call
- * list, and not already attempted during this session.
+ * list. Prefers prospects never attempted this session; once those run
+ * out, retries busy/no-answer prospects from earlier in the same session
+ * (skipping failed numbers and anything already dispositioned) before
+ * the queue is truly empty.
  */
 export async function getNextProspect(sessionId: string) {
-  const alreadyCalled = await prisma.call.findMany({
+  const callsThisSession = await prisma.call.findMany({
     where: { sessionId },
-    select: { prospectId: true },
+    select: { prospectId: true, state: true, disposition: true },
+    orderBy: { startedAt: "asc" },
   });
-  const excludeIds = alreadyCalled.map((c) => c.prospectId);
+  const attemptedIds = callsThisSession.map((c) => c.prospectId);
 
-  return prisma.prospect.findFirst({
+  const fresh = await prisma.prospect.findFirst({
     where: {
-      id: excludeIds.length ? { notIn: excludeIds } : undefined,
+      id: attemptedIds.length ? { notIn: attemptedIds } : undefined,
       relationshipStatus: { not: "DO_NOT_CALL" },
     },
     orderBy: [{ lastContactedAt: "asc" }, { createdAt: "asc" }],
+  });
+  if (fresh) return fresh;
+
+  const attemptCounts = new Map<string, number>();
+  for (const c of callsThisSession) {
+    attemptCounts.set(c.prospectId, (attemptCounts.get(c.prospectId) ?? 0) + 1);
+  }
+
+  const retryCandidateId = callsThisSession.find(
+    (c) =>
+      RETRYABLE_STATES.has(c.state) &&
+      !c.disposition &&
+      (attemptCounts.get(c.prospectId) ?? 0) < MAX_ATTEMPTS_PER_PROSPECT
+  )?.prospectId;
+  if (!retryCandidateId) return null;
+
+  return prisma.prospect.findFirst({
+    where: { id: retryCandidateId, relationshipStatus: { not: "DO_NOT_CALL" } },
   });
 }
 

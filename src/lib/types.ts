@@ -91,6 +91,12 @@ export interface SessionSnapshot {
   activity: ActivityEventSnapshot[];
 }
 
+export interface DailyProgress {
+  dials: number;
+  goal: number;
+  pct: number;
+}
+
 export const DISPOSITIONS: {
   key: Disposition;
   shortcut: string;

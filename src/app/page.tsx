@@ -7,6 +7,7 @@ import { ArenaBanner } from "@/components/dialer/ArenaBanner";
 import { ArenaStage } from "@/components/dialer/ArenaStage";
 import { StartScreen } from "@/components/dialer/StartScreen";
 import { GameOverScreen } from "@/components/dialer/GameOverScreen";
+import { DailyGoalBar } from "@/components/dialer/DailyGoalBar";
 import type { Disposition } from "@/lib/types";
 
 export default function DialerArenaPage() {
@@ -76,6 +77,7 @@ export default function DialerArenaPage() {
     return (
       <div className="flex flex-1 flex-col">
         <ArenaBanner snapshot={null} />
+        <DailyGoalBar />
         <StartScreen onStart={handleStart} />
       </div>
     );
@@ -85,6 +87,7 @@ export default function DialerArenaPage() {
     return (
       <div className="flex flex-1 flex-col">
         <ArenaBanner snapshot={snapshot} />
+        <DailyGoalBar />
         <GameOverScreen snapshot={snapshot} onNewSession={handleNewSession} />
       </div>
     );
@@ -93,6 +96,7 @@ export default function DialerArenaPage() {
   return (
     <div className="flex flex-1 flex-col">
       <ArenaBanner snapshot={snapshot} />
+      <DailyGoalBar />
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-4">
         <div className="flex items-center justify-end">
           <button
